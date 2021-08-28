@@ -1,2 +1,2 @@
-# mixture_density_network
+# mixture density network
 multimodal distributions with neural networks
