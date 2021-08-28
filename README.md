@@ -15,5 +15,5 @@ Sampling from this distribution will then give the model the ability to represen
 Goal is to directly learn a bimodal distribution for a fixed input. <br>
 This is done by first predefining a fixed input, and then sampling target points around 5 and -5. <br>
 
-![](multimodal_density.gif)  
+![](bimodal_density.gif)  
  
