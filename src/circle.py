@@ -8,25 +8,24 @@ import math
 
 
 class gaussian_mix(nn.Module):
-    def __init__(self,input_size,num_gaussians,dimensions_gaussian=1):
+    def __init__(self,input_size:int,num_gaussians:int,dimensions_gaussian:int) -> None:
         super().__init__()
         self.num_gaussians = num_gaussians
         self.dimensions_gaussian = dimensions_gaussian
         self.layer_means = nn.Linear(input_size,num_gaussians*dimensions_gaussian)
-        self.layer_std = nn.Linear(input_size,num_gaussians)
+        self.layer_std = nn.Linear(input_size,num_gaussians*dimensions_gaussian)
         self.layer_weights = nn.Linear(input_size,num_gaussians)
 
-    def forward(self,x):
-        
-        means = self.layer_means(x).view(x.size(0),self.num_gaussians,self.dimensions_gaussian) #(batch,num_gaussians,dimensions_gaussian)
-        std = (nn.ELU()(self.layer_std(x))+1+1e-15).view(x.size(0),self.num_gaussians,self.dimensions_gaussian)
+    def forward(self,x:torch.Tensor) -> D.MixtureSameFamily:
+        batch_size = x.size(0)
+        means = self.layer_means(x).view(batch_size,self.num_gaussians,self.dimensions_gaussian) #(batch,num_gaussians,dimensions_gaussian)
+        std = (nn.ELU()(self.layer_std(x))+1+1e-15).view(batch_size,self.num_gaussians,self.dimensions_gaussian)
         weights = nn.Softmax(dim=1)(self.layer_weights(x))
-
+        
         mix = D.Categorical(weights)
         comp = D.Independent(D.Normal(loc=means,scale= std), 1) 
-        
         dist = D.MixtureSameFamily(mix, comp)
-    
+
         return dist
 
 class net(nn.Module):
